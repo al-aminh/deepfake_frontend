@@ -1,28 +1,3 @@
-// import 'dart:convert';
-// import 'dart:io';
-// import 'package:http/http.dart' as http;
-// import '../config/api_config.dart';
-
-// class VideoDetectorService {
-//   Future<Map<String, dynamic>> detect(File file) async {
-//     final uri = Uri.parse('${ApiConfig.baseUrl}/detect/video');
-
-//     final req = http.MultipartRequest('POST', uri);
-//     req.files.add(await http.MultipartFile.fromPath('file', file.path));
-
-//     final streamed = await req.send().timeout(const Duration(minutes: 3));
-//     final res = await http.Response.fromStream(streamed);
-
-//     if (res.statusCode >= 200 && res.statusCode < 300) {
-//       return jsonDecode(res.body) as Map<String, dynamic>;
-//     }
-//     throw Exception('Video detect failed: ${res.statusCode} ${res.body}');
-//   }
-// }
-
-
-
-
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -31,13 +6,14 @@ import 'package:http_parser/http_parser.dart';
 import '../config/api_config.dart';
 import '../models/picked_media.dart';
 
-class VideoDetectorService {
+class AudioDetectorService {
   Future<Map<String, dynamic>> detect(PickedMedia media) async {
-    final uri = Uri.parse('${ApiConfig.baseUrl}/detect/video');
+    final uri = Uri.parse('${ApiConfig.baseUrl}/detect/audio');
 
-    final mime = media.mimeType.isNotEmpty ? media.mimeType : 'video/mp4';
+    final mime = media.mimeType.isNotEmpty ? media.mimeType : 'audio/mpeg';
     final parts = mime.split('/');
-    final contentType = MediaType(parts[0], parts.length > 1 ? parts[1] : 'mp4');
+    final contentType =
+        MediaType(parts[0], parts.length > 1 ? parts[1] : 'mpeg');
 
     final req = http.MultipartRequest('POST', uri);
 
@@ -67,12 +43,12 @@ class VideoDetectorService {
       );
     }
 
-    final streamed = await req.send().timeout(const Duration(minutes: 3));
+    final streamed = await req.send().timeout(const Duration(minutes: 2));
     final res = await http.Response.fromStream(streamed);
 
     if (res.statusCode >= 200 && res.statusCode < 300) {
       return jsonDecode(res.body) as Map<String, dynamic>;
     }
-    throw Exception('Video detect failed: ${res.statusCode} ${res.body}');
+    throw Exception('Audio detect failed: ${res.statusCode} ${res.body}');
   }
 }
